@@ -35,7 +35,7 @@ except ImportError:
 # ============================================
 # CONFIGURATION
 # ============================================
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(__name__, static_folder='static', static_url_path='/static', template_folder='templates')
 CORS(app)
 DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'inventory.db')
 
@@ -592,9 +592,8 @@ def manual_stock_check():
 # --- Serve Frontend ---
 @app.route('/')
 def index():
-    html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'index.html')
-    with open(html_path, 'r') as f:
-        return Response(f.read(), content_type='text/html')
+    from flask import render_template
+    return render_template('index.html')
 
 
 # ============================================
@@ -614,4 +613,5 @@ if __name__ == '__main__':
     print("  Smart Inventory Manager MVP")
     print("  Running on http://localhost:5000")
     print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
+    app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
+

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>Smart Inventory Manager</title>
+<title>Smart Inventory</title>
 <meta name="description" content="AI-powered inventory management system">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,8 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{
-surface:{900:'#0b1120',800:'#111827',700:'#1e293b',600:'#334155'},
-accent:{400:'#22d3ee',500:'#06b6d4',600:'#0891b2'},
+surface:{900:'#0f172a',800:'#1e293b',700:'#334155',600:'#475569'},
+accent:{400:'#38bdf8',500:'#0ea5e9',600:'#0284c7'},
 success:{400:'#4ade80',500:'#22c55e'},
 warn:{400:'#fbbf24',500:'#f59e0b'},
 danger:{400:'#f87171',500:'#ef4444'}
@@ -38,10 +38,12 @@ danger:{400:'#f87171',500:'#ef4444'}
 </div>
 
 <!-- Header -->
-<header class="sticky top-0 z-40 bg-surface-900/80 backdrop-blur-xl border-b border-white/5">
-  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-    <h1 class="text-lg font-bold bg-gradient-to-r from-accent-400 to-accent-500 bg-clip-text text-transparent">📦 InvenAI</h1>
-    <button onclick="manualStockCheck()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 transition">🔄 Check Stock</button>
+<header class="sticky top-0 z-40 bg-surface-900/85 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/30">
+  <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+    <h1 class="text-xl font-black tracking-tight bg-gradient-to-r from-accent-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm flex items-center gap-2">
+      <span class="text-2xl drop-shadow-md">📦</span> Smart Inventory
+    </h1>
+    <button onclick="manualStockCheck()" class="text-xs font-medium bg-surface-700/50 hover:bg-surface-600 px-4 py-2 rounded-xl border border-white/10 shadow-sm hover:shadow-accent-500/20 transition-all duration-300">🔄 Sync Stock</button>
   </div>
 </header>
 
@@ -94,7 +96,10 @@ danger:{400:'#f87171',500:'#ef4444'}
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-1">Category</label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-sm font-medium text-gray-400">Category</label>
+            <button type="button" onclick="openCategoryModal()" class="text-xs text-accent-400 hover:text-accent-300 font-medium">+ New</button>
+          </div>
           <select id="f-cat" class="w-full bg-surface-700 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none"></select>
         </div>
         <div>

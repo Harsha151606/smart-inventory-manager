@@ -1,8 +1,11 @@
 // Smart Inventory Manager - Frontend Logic
 let categories=[], scannerInstance=null, forecastChart=null, searchTimer=null;
 
-// --- Navigation ---
+// --- Navigation & Dynamic Sync ---
+let currentActiveView = 'dash';
+
 function navigate(view){
+  currentActiveView = view;
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
   document.getElementById('view-'+view).classList.remove('hidden');
   document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.toggle('active',b.dataset.view===view)});
@@ -12,6 +15,13 @@ function navigate(view){
   if(view==='analytics')loadAnalytics();
   if(view!=='scan')stopScanner();
 }
+
+// Global Auto-Sync (Every 10 seconds)
+setInterval(() => {
+  if (currentActiveView === 'dash') loadDashboard(true);
+  if (currentActiveView === 'inv') loadItems(true);
+  if (currentActiveView === 'analytics') loadAnalytics(true);
+}, 10000);
 
 // --- API ---
 async function api(url,opts={}){
@@ -119,7 +129,14 @@ async function loadItems(){
 async function quickUpdate(id,dir){
   const url=`/api/items/${id}/${dir==='inc'?'increment':'decrement'}`;
   const r=await api(url,{method:'POST',body:JSON.stringify({amount:1})});
-  if(r){document.getElementById('qty-'+id).textContent=r.quantity;toast(dir==='inc'?'Stock added':'Stock removed');}
+  if(r){
+    toast(dir==='inc'?'Stock added':'Stock removed');
+    if(!document.getElementById('view-detail').classList.contains('hidden')){
+      viewItem(id);
+    } else {
+      loadItems();
+    }
+  }
 }
 
 // --- Item Detail ---
@@ -213,6 +230,33 @@ async function deleteItem(id){
 }
 
 // --- Categories ---
+function openCategoryModal() {
+  const mc = document.getElementById('modal-content');
+  mc.innerHTML = `
+    <h3 class="text-xl font-bold mb-4">Add New Category</h3>
+    <input id="new-cat-name" placeholder="Category Name (e.g. Beverages)" class="w-full mb-4 bg-surface-700 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-500/50">
+    <div class="flex gap-2">
+      <button onclick="submitCategory()" class="flex-1 py-2.5 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition">Save</button>
+      <button onclick="closeModal()" class="px-4 py-2.5 bg-surface-700 rounded-xl border border-white/10 hover:bg-surface-600">Cancel</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('new-cat-name').focus();
+}
+
+async function submitCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if(!name) return toast('Category name is required', 'error');
+  const r = await api('/api/categories', {method: 'POST', body: JSON.stringify({name, color: '#0ea5e9'})});
+  if(r) {
+    if(r.error) return toast(r.error, 'error');
+    toast('Category created');
+    closeModal();
+    await loadCategories();
+    await loadCatDropdown();
+    document.getElementById('f-cat').value = r.id; // auto-select it
+  }
+}
 async function loadCategories(){
   categories=await api('/api/categories')||[];
   const sel=document.getElementById('filter-cat');
